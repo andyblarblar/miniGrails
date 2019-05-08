@@ -7,8 +7,17 @@ class UserInterceptor {
         match(controller:"UserController").excludes(action:"save")
     }
 
-    boolean before() {
-        if(request.ty)// get if GET or PUT. put needs a full onject with credentials, get just needs crednetials
+    boolean before() {//get only needs credentials, all others need the same user(including password)
+        if(request.get){
+            if(User.where {usrCredentials == request.JSON}.exists()){
+                return true
+            }
+            return false
+        }
+        if(User.where {request.JSON as User == it}.exists()){
+            return true
+        }
+        return false
 
     }
 

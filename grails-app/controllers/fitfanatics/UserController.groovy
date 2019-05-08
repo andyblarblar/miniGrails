@@ -72,13 +72,13 @@ class UserController {
     }
 
     @Transactional
-    def delete(Long id) {
-        if (id == null) {
+    def delete(User user) {//needs a full user in the request, dont use in client
+        if (user == null) {
             render status: NOT_FOUND
             return
         }
 
-        userService.delete(id)
+        userService.delete(user.id)
 
         render status: NO_CONTENT
     }
