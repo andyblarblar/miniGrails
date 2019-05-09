@@ -18,13 +18,13 @@ class UserController {
     static responseFormats = ['json', 'xml']
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-   /* def index(Integer max) {
+    def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond userService.list(params), model:[userCount: userService.count()]
-    } */
+    }
 
-    def show(Credentials credentials) {//returns only the object with the same credentials
-        respond User.where {usrCredentials == credentials}
+    def show() {//returns only the object with the same credentials TODO
+        respond User.where {}
     }
 
     @Transactional
@@ -72,7 +72,7 @@ class UserController {
     }
 
     @Transactional
-    def delete(User user) {//needs a full user in the request, dont use in client
+    def delete(User user) {//needs a full user in the request, dont use in client TODO
         if (user == null) {
             render status: NOT_FOUND
             return

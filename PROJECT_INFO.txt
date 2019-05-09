@@ -1,0 +1,6 @@
+HTML:
+credentials are passed to the server with an HTTP Authorisation header in format: basic username:password
+
+
+
+

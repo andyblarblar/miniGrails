@@ -1,23 +1,25 @@
 package fitfanatics
 
-import grails.converters.JSON
-
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 class UserInterceptor {
 
     UserInterceptor(){
-        match(controller:"UserController").excludes(action:"save")
     }
 
     boolean before() {//get only needs credentials, all others need the same user(including password)
-        if(request.get){
-            if(User.where {usrCredentials == new Credentials(JSON.parse(request.JSON.toString()))}.exists()){
+        try {
+            int indexOfColon = decodeBase64(request.getHeader("Authorization")).toString().indexOf(":")
+            String username = decodeBase64(request.getHeader("Authorization")).toString().substring(0, indexOfColon)
+            String password = decodeBase64(request.getHeader("Authorization")).toString().substring(indexOfColon + 1)
+
+            if (DbAuths.list().find { it.username == username && it.password == password } != null) {//querys all auths for given username and password TODO add encypt
                 return true
             }
-            return false
         }
-        if(User.find(new User(JSON.parse(request.JSON.toString())))){
-            return true
+        catch (Exception e ){
+           println("no auth in request at: ${new Date()}")
+            render status: UNAUTHORIZED
         }
         return false
 

@@ -9,9 +9,10 @@ class UrlMappings {
         post "/$controller(.$format)?"(action:"save")
         put "/$controller/$id(.$format)?"(action:"update")
         patch "/$controller/$id(.$format)?"(action:"patch")
-        "/user"(resources:"user")
+        "/users"(resources:"user")
         "/"(controller: 'application', action:'index')
         "500"(view: '/error')
         "404"(view: '/notFound')
+        "401"(view: '/unauthorized')//TODO make gson
     }
 }
