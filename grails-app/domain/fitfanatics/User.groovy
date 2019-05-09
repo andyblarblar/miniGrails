@@ -3,7 +3,7 @@ package fitfanatics
 class User {
     String fname
     String lname
-    Credentials usrCredentials
+    Credentials usrCredentials// remove and replace with http header based login
 
     static constraints = {
         usrCredentials nullable: false
@@ -16,5 +16,7 @@ class Credentials{
     //static belongsTo = [user:User] uneeded
 
     static constraints = {
+        username nullable: false
+        password nullable: false
     }
 }
