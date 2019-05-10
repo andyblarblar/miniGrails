@@ -23,8 +23,8 @@ class UserController {
         respond userService.list(params), model:[userCount: userService.count()]
     }
 
-    def show() {//returns only the object with the same credentials TODO
-        respond User.where {}
+    def show(long id) {
+        respond userService.get(id)
     }
 
     @Transactional
@@ -72,13 +72,13 @@ class UserController {
     }
 
     @Transactional
-    def delete(User user) {//needs a full user in the request, dont use in client TODO
-        if (user == null) {
+    def delete(long id) {//needs a full user in the request, dont use in client TODO
+        if (userService.get(id) == null) {
             render status: NOT_FOUND
             return
         }
 
-        userService.delete(user.id)
+        userService.delete(id)
 
         render status: NO_CONTENT
     }
