@@ -13,6 +13,6 @@ class UrlMappings {
         "/"(controller: 'application', action:'index')
         "500"(view: '/error')
         "404"(view: '/notFound')
-        "401"(view: '/unauthorized')//TODO make gson
+        "401"(view: '/unauthorized')
     }
 }
