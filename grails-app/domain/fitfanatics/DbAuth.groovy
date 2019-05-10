@@ -3,9 +3,11 @@ package fitfanatics
 class DbAuth {
     String username
     String password
-    static hasMany = [users:User]// each account has many users TODO
+    static hasOne = [user:User]//TODO
     static constraints = {
         username nullable: false
+        username unique: true
         password nullable: false
+        password unique: true
     }
 }

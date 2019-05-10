@@ -11,77 +11,75 @@ import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 
 @ReadOnly
-class UserController {
+class DbAuthController {
 
-    UserService userService
+    DbAuthService dbAuthService
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]//change to not return any, work through DbAuth user id and reurn that instead
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond userService.list(params), model:[userCount: userService.count()]
+        respond dbAuthService.list(params), model:[dbAuthCount: dbAuthService.count()]
     }
 
-    def show(long id) {
-        respond userService.get(id)
+    def show(Long id) {
+        respond dbAuthService.get(id)
     }
 
     @Transactional
-    def save(User user) {
-        if (user == null) {
+    def save(DbAuth dbAuth) {
+        if (dbAuth == null) {
             render status: NOT_FOUND
             return
         }
-        if (user.hasErrors()) {
+        if (dbAuth.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond user.errors
+            respond dbAuth.errors
             return
         }
 
         try {
-            userService.save(user)
+            dbAuthService.save(dbAuth)
         } catch (ValidationException e) {
-            respond user.errors
+            respond dbAuth.errors
             return
         }
 
-        respond user, [status: CREATED, view:"show"]
+        respond dbAuth, [status: CREATED, view:"show"]
     }
 
     @Transactional
-    def update(User user) {
-        if (user == null) {
+    def update(DbAuth dbAuth) {
+        if (dbAuth == null) {
             render status: NOT_FOUND
             return
         }
-        if (user.hasErrors()) {
+        if (dbAuth.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond user.errors
+            respond dbAuth.errors
             return
         }
 
         try {
-            userService.save(user)
+            dbAuthService.save(dbAuth)
         } catch (ValidationException e) {
-            respond user.errors
+            respond dbAuth.errors
             return
         }
 
-        respond user, [status: OK, view:"show"]
+        respond dbAuth, [status: OK, view:"show"]
     }
 
     @Transactional
-    def delete(long id) {//needs a full user in the request, dont use in client TODO
-        if (userService.get(id) == null) {
+    def delete(Long id) {
+        if (id == null) {
             render status: NOT_FOUND
             return
         }
 
-        userService.delete(id)
+        dbAuthService.delete(id)
 
         render status: NO_CONTENT
     }
-
-
 }
