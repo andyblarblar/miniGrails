@@ -6,15 +6,16 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 class UserInterceptor {
 
-    UserInterceptor(){//for DbAuth controller and User
+    UserInterceptor(){
+        matchAll()//exclude errors TODO
     }
 
-    boolean before() {//get only needs credentials, all others need the same user(including password)
+    boolean before() {//lets you through if the authoization header has a username and password that exists
         try {
             String username = HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization"))
             String password = HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))
 
-            if (DbAuth.list().find { it.username == username && it.password == password } != null) {//querys all auths for given username and password TODO add encypt
+            if (DbAuth.list().find { it.username == username && it.password == password } != null) {//querys all auths for given username and password TODO add encypt (change to findWhere?)
 
                 return true
             }

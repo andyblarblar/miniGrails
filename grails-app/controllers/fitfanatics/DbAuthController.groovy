@@ -1,5 +1,6 @@
 package fitfanatics
 
+import com.juniorgang.util.HeaderParser
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -14,17 +15,24 @@ import grails.gorm.transactions.Transactional
 class DbAuthController {
 
     DbAuthService dbAuthService
-
+    UserService userService
     static responseFormats = ['json', 'xml']
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+/* unneeded
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond dbAuthService.list(params), model:[dbAuthCount: dbAuthService.count()]
     }
+*/
 
-    def show(Long id) {
-        respond dbAuthService.get(id)
+    /**
+     * gets the user associated with the Auth, must GET users/show
+     */
+    def show() {
+        respond userService.get(DbAuth.findWhere(
+                username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
+                password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).user.id)
     }
 
     @Transactional
@@ -41,7 +49,7 @@ class DbAuthController {
 
         try {
             dbAuthService.save(dbAuth)
-        } catch (ValidationException e) {
+        } catch (ValidationException e) {//keep, Dbauth can through if not unique pass and username
             respond dbAuth.errors
             return
         }
@@ -50,35 +58,36 @@ class DbAuthController {
     }
 
     @Transactional
-    def update(DbAuth dbAuth) {
-        if (dbAuth == null) {
+    def update(User user) {//currently 404s
+        println("acssesed")//for testing
+        if (user == null) {
             render status: NOT_FOUND
             return
         }
-        if (dbAuth.hasErrors()) {
+        if (user.hasErrors()) {
             transactionStatus.setRollbackOnly()
             respond dbAuth.errors
             return
         }
 
         try {
-            dbAuthService.save(dbAuth)
+            userService.save(user)
         } catch (ValidationException e) {
-            respond dbAuth.errors
+            respond user.errors
             return
         }
 
-        respond dbAuth, [status: OK, view:"show"]
+        respond user, [status: OK, view:"show"]
     }
 
     @Transactional
-    def delete(Long id) {
-        if (id == null) {
-            render status: NOT_FOUND
-            return
-        }
-
-        dbAuthService.delete(id)
+    /**
+     * deletes the auth and user associated with the HTTP header
+     */
+    def delete() {
+        dbAuthService.delete(DbAuth.findWhere(
+                username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
+                password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).id)
 
         render status: NO_CONTENT
     }

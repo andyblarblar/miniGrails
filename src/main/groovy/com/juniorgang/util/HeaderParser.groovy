@@ -1,5 +1,7 @@
 package com.juniorgang.util
 
+import fitfanatics.DbAuth
+
 /**
  * A utility class that handles parsing of authentication headers
  */
@@ -24,7 +26,6 @@ class HeaderParser {
         int indexOfColon = header.indexOf(":")
         return header.substring(indexOfColon+1)
     }
-
 
 
 }
