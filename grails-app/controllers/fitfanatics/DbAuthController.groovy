@@ -29,32 +29,29 @@ class DbAuthController {
     /**
      * gets the user associated with the Auth, must GET users/show
      */
-    def show() {
-        respond userService.get(DbAuth.findWhere(
-                username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
-                password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).user.id)
+    def show() {//be careful recompiling
+        try {
+            respond userService.get(DbAuth.findWhere(
+                    username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
+                    password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).id)
+        }
+        catch (Exception e){println("showing a user that deosnt exist,should only happen if in ide")}
     }
 
     @Transactional
-    def save(DbAuth dbAuth) {
-        if (dbAuth == null) {
-            render status: NOT_FOUND
-            return
-        }
-        if (dbAuth.hasErrors()) {
-            transactionStatus.setRollbackOnly()
-            respond dbAuth.errors
-            return
-        }
-
+    def save(User user) {
+        def auth = new DbAuth(
+                username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
+                password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization")),
+                user: user)
         try {
-            dbAuthService.save(dbAuth)
+            dbAuthService.save(auth)
         } catch (ValidationException e) {//keep, Dbauth can through if not unique pass and username
-            respond dbAuth.errors
+            respond auth.errors
             return
         }
 
-        respond dbAuth, [status: CREATED, view:"show"]
+        respond auth, [status: CREATED, view:"show"]
     }
 
     @Transactional
