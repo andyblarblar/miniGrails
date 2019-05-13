@@ -5,8 +5,8 @@ class User {
     String lname
     static belongsTo = [dbauth:DbAuth]
     static constraints = {
-
     }
+
 }
 
 

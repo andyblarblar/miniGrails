@@ -39,6 +39,7 @@ class DbAuthController {
      * Creates a new User and Auth based off the Authorization HTTP header and the included JSON payload
      */
     def save(User user) {
+
         def auth = new DbAuth(
                 username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
                 password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization")),
@@ -53,12 +54,14 @@ class DbAuthController {
         respond auth, [status: CREATED, view:"show"]
     }
 
-    @Transactional
+    @Transactional//TODO
     def update() {
         User user = new User(request.JSON)
+        println(user.properties)
         user.dbauth = DbAuth.findWhere(
                 username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
                 password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization")))
+
         println("acssesed")//for testing
         if (user == null) {
             render status: NOT_FOUND
