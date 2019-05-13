@@ -19,26 +19,25 @@ class DbAuthController {
     static responseFormats = ['json', 'xml']
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-/* unneeded
-    def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond dbAuthService.list(params), model:[dbAuthCount: dbAuthService.count()]
-    }
-*/
-
     /**
      * gets the user associated with the Auth, must GET users/show
      */
-    def show() {//be careful recompiling
+    def show() {
         try {
             respond userService.get(DbAuth.findWhere(
                     username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
                     password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).id)
         }
-        catch (Exception e){println("showing a user that deosnt exist,should only happen if in ide")}
+        catch (Exception e){println("PASSWORD GOT THROUGH INTERCEPTOR")
+
+        }
+
     }
 
     @Transactional
+    /**
+     * Creates a new User and Auth based off the Authorization HTTP header and the included JSON payload
+     */
     def save(User user) {
         def auth = new DbAuth(
                 username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
@@ -55,7 +54,7 @@ class DbAuthController {
     }
 
     @Transactional
-    def update(User user) {//currently 404s
+    def update(User user) {
         println("acssesed")//for testing
         if (user == null) {
             render status: NOT_FOUND

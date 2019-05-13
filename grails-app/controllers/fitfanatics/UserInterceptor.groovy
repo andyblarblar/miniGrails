@@ -7,7 +7,8 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED
 class UserInterceptor {
 
     UserInterceptor(){
-        match(controller: 'DbAuth',action: '*').excludes(action: 'save')
+        matchAll().except(controller:'dbAuth',action:'save')//fixed
+
     }
 
     boolean before() {//lets you through if the authoization header has a username and password that exists
@@ -15,8 +16,7 @@ class UserInterceptor {
             String username = HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization"))
             String password = HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))
 
-            if (DbAuth.list().find { it.username == username && it.password == password } != null) {//querys all auths for given username and password TODO add encypt (change to findWhere?) test this method
-
+            if (DbAuth.findWhere(username: username, password: password) != null) {//querys all auths for given username and password TODO add encypt
                 return true
             }
         }
