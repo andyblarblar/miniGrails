@@ -26,7 +26,7 @@ class DbAuthController {
         try {
             respond userService.get(DbAuth.findWhere(
                     username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
-                    password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).id)
+                    password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).user.id)
         }
         catch (Exception e){println("PASSWORD GOT THROUGH INTERCEPTOR")
 
@@ -54,7 +54,11 @@ class DbAuthController {
     }
 
     @Transactional
-    def update(User user) {
+    def update() {
+        User user = new User(request.JSON)
+        user.dbauth = DbAuth.findWhere(
+                username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
+                password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization")))
         println("acssesed")//for testing
         if (user == null) {
             render status: NOT_FOUND
@@ -62,12 +66,12 @@ class DbAuthController {
         }
         if (user.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond dbAuth.errors
+            respond user.errors
             return
         }
 
         try {
-            userService.save(user)
+           user.save()
         } catch (ValidationException e) {
             respond user.errors
             return

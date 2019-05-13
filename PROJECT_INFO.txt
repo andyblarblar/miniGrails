@@ -2,7 +2,7 @@ HTTP:
 users is the access point for resources
 credentials are passed to the server with an HTTP Authorisation header in format: basic username:password, needed for everything(but POST).
 
-GET users/ will respond with the user associated with the login sent in the HTTP header.
+GET users/show will respond with the user associated with the login sent in the HTTP header.
 
 DELETE users/ will delete the Auth and User based on the HTTP header.
 
