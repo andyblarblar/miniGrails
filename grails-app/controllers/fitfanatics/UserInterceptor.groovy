@@ -7,11 +7,11 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED
 class UserInterceptor {
 
     UserInterceptor(){
-        matchAll().except(controller:'dbAuth',action:'save')//fixed
+        matchAll().except(controller:'dbAuth',action:'save')
 
     }
 
-    boolean before() {//lets you through if the authoization header has a username and password that exists
+    boolean before() {//lets you through if the authorization header has a username and password that exists
         try {
             String username = HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization"))
             String password = HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))
@@ -21,7 +21,7 @@ class UserInterceptor {
             }
         }
         catch (Exception e ){
-           println("no auth in request at: ${request.requestURL} ${e.printStackTrace()}")
+           println("no auth in request at: ${request.requestURL}")
             render status: UNAUTHORIZED
             return false
         }

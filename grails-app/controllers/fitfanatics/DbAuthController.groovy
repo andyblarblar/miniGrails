@@ -29,7 +29,6 @@ class DbAuthController {
                     password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization"))).user.id)
         }
         catch (Exception e){println("PASSWORD GOT THROUGH INTERCEPTOR")
-
         }
 
     }
@@ -39,14 +38,13 @@ class DbAuthController {
      * Creates a new User and Auth based off the Authorization HTTP header and the included JSON payload
      */
     def save(User user) {
-
         def auth = new DbAuth(
                 username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
                 password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization")),
                 user: user)
         try {
             dbAuthService.save(auth)
-        } catch (ValidationException e) {//keep, Dbauth can through if not unique pass and username
+        } catch (ValidationException e) {
             respond auth.errors
             return
         }
@@ -54,15 +52,17 @@ class DbAuthController {
         respond auth, [status: CREATED, view:"show"]
     }
 
-    @Transactional//TODO
+    @Transactional
+    /**
+     * Updates a created user using the JSON payload. Request to users/update
+     */
     def update() {
-        User user = new User(request.JSON)
-        println(user.properties)
-        user.dbauth = DbAuth.findWhere(
+        User user = new User(request.JSON) //needed as we dont send the id, so the user is incomplete
+        DbAuth dbAuth = DbAuth.findWhere(
                 username: HeaderParser.getUsernameFromAuthHeader(request.getHeader("Authorization")),
                 password: HeaderParser.getPasswordFromAuthHeader(request.getHeader("Authorization")))
+        dbAuth.setUser(user)
 
-        println("acssesed")//for testing
         if (user == null) {
             render status: NOT_FOUND
             return
@@ -72,14 +72,12 @@ class DbAuthController {
             respond user.errors
             return
         }
-
         try {
-           user.save()
+           dbAuthService.save(dbAuth)
         } catch (ValidationException e) {
             respond user.errors
             return
         }
-
         respond user, [status: OK, view:"show"]
     }
 

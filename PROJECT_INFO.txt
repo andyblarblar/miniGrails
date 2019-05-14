@@ -8,7 +8,7 @@ DELETE users/ will delete the Auth and User based on the HTTP header.
 
 POST users/ will create a new user and Auth based off the sent Authorization header and JSON payload
 
-
+PUT users/update will update the user associated with the HTTP header using the requests JSON payload
 
 
 
